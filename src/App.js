@@ -9,11 +9,18 @@ for (var i = 0; i <= 50; i++) {
   GRID_ARRAY.push(i);
 }
 
+const KEY_CODES_MAPPER = {
+  38: 'UP',
+  39: 'RIGHT',
+  37: 'LEFT',
+  40: 'BOTTOM',
+};
+
 const CONTROLS = {
   UP: 'UP',
-  BOTTOM: 'BOTTOM',
   RIGHT: 'RIGHT',
   LEFT: 'LEFT',
+  BOTTOM: 'BOTTOM',
 };
 
 const DIRECTION_TICKS = {
@@ -24,11 +31,17 @@ const DIRECTION_TICKS = {
 };
 
 // TODO compose instead
-const setSnakePosition = (prevState) => ({
+const applySnakePosition = (prevState) => ({
   snake: {
     position: {
       ...DIRECTION_TICKS[prevState.controls.direction](prevState.snake.position.x, prevState.snake.position.y),
     },
+  },
+});
+
+const doChangeDirection = (direction) => () => ({
+  controls: {
+    direction,
   },
 });
 
@@ -57,19 +70,30 @@ class App extends Component {
   }
 
   componentDidMount() {
-    this.interval = setInterval(this.tick, 150);
+    this.interval = setInterval(this.onTick, 150);
+
+    window.addEventListener('keyup', this.onChangeDirection, false);
   }
 
   componentWillUnmount() {
     clearInterval(this.interval);
+
+    window.removeEventListener('keyup', this.onChangeDirection, false);
   }
 
-  tick = () => {
-    this.setState(setSnakePosition)
+  onTick = () => {
+    this.setState(applySnakePosition);
+  }
+
+  onChangeDirection = (e) => {
+    if (KEY_CODES_MAPPER[e.keyCode]) {
+      this.setState(doChangeDirection(KEY_CODES_MAPPER[e.keyCode]));
+    }
   }
 
   render() {
-    const { snake, snack } = this.state;
+    const { snake, snack } = this.state
+    console.log(this.state.controls.direction);;
     return (
       <div>
         <Grid
