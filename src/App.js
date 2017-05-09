@@ -1,14 +1,11 @@
 import React, { Component } from 'react';
 import cs from 'classnames';
 
-import { some } from 'lodash';
-
 import './App.css';
 
 const GRID_SIZE = 40;
 const TICK_RATE = 100;
-
-var GRID_ARRAY = [];
+const GRID_ARRAY = [];
 
 for (var i = 0; i <= GRID_SIZE; i++) {
   GRID_ARRAY.push(i);
@@ -39,7 +36,10 @@ const isPosition = (x, y, diffX, diffY) =>
   x === diffX && y === diffY;
 
 const getRandomCoordinate = () =>
-  ({ x: Math.floor(Math.random() * GRID_SIZE), y: Math.floor(Math.random() * GRID_SIZE) });
+  ({
+    x: Math.floor(Math.random() * GRID_SIZE),
+    y: Math.floor(Math.random() * GRID_SIZE),
+  });
 
 // TODO make own some, use compose
 const isSnake = (x, y, snakeCoordinates) => {
@@ -49,16 +49,11 @@ const isSnake = (x, y, snakeCoordinates) => {
     }
   }
   return false;
-}
+};
 
 // TODO compose instead: direction ticks
 // TODO make last a previous compose step
 const applySnakePosition = (prevState) => {
-  // TODO babel stage
-  // const [...snakeCoordinatesWithoutLast, lastCoordinate] = prevState.snake.coordinates;
-
-  // const snakeCoordinatesWithoutLast = prevState.snake.coordinates.slice()
-
   const isSnakeEating = getIsSnakeEating(prevState);
 
   const snakeHead = DIRECTION_TICKS[prevState.controls.direction](
@@ -66,6 +61,8 @@ const applySnakePosition = (prevState) => {
     prevState.snake.coordinates[0].y,
   );
 
+  // TODO babel stage
+  // const [...snakeCoordinatesWithoutLast, lastCoordinate] = prevState.snake.coordinates;
   const snakeTail = isSnakeEating
     ? prevState.snake.coordinates
     : prevState.snake.coordinates.slice(0, prevState.snake.coordinates.length - 1);
@@ -74,15 +71,13 @@ const applySnakePosition = (prevState) => {
    ? getRandomCoordinate()
    : prevState.snack.coordinate;
 
-   console.log(snackCoordinate);
-
   return {
     snake: {
-      coordinates: [snakeHead].concat(snakeTail)
+      coordinates: [snakeHead].concat(snakeTail), // babel
     },
     snack: {
-      coordinate: snackCoordinate
-    }
+      coordinate: snackCoordinate,
+    },
   };
 };
 
@@ -93,7 +88,7 @@ const doChangeDirection = (direction) => () => ({
 });
 
 const getIsSnakeEating = ({ snake, snack }) =>
- isPosition(snake.coordinates[0].x, snake.coordinates[0].y, snack.coordinate.x, snack.coordinate.y)
+ isPosition(snake.coordinates[0].x, snake.coordinates[0].y, snack.coordinate.x, snack.coordinate.y);
 
 class App extends Component {
   constructor(props) {
@@ -110,7 +105,6 @@ class App extends Component {
         coordinate: getRandomCoordinate(),
       },
     };
-
   }
 
   componentDidMount() {
@@ -136,7 +130,7 @@ class App extends Component {
   }
 
   render() {
-    const { snake, snack } = this.state
+    const { snake, snack } = this.state;
     return (
       <div>
         <Grid
@@ -169,21 +163,7 @@ const Row = ({ snake, snack, y }) =>
     />)}
   </div>
 
-const Cell = ({
-  snake,
-  snack,
-  x,
-  y,
-}) => {
-  const cellCs = cs(
-    "grid-cell",
-    {
-      "grid-cell-snake": isSnake(x, y, snake.coordinates),
-      "grid-cell-snack": isPosition(x, y, snack.coordinate.x, snack.coordinate.y),
-    }
-  );
-
-  return <div className={cellCs} />;
-}
+const Cell = ({ snake, snack, x, y }) =>
+  <div className={getCellCs(sname, snack, x, y)} />;
 
 export default App;
