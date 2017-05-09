@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import { connect } from 'react-redux';
 import cs from 'classnames';
 
 import './App.css';
@@ -10,11 +9,37 @@ for (var i = 0; i <= 50; i++) {
   GRID_ARRAY.push(i);
 }
 
+const CONTROLS = {
+  UP: 'UP',
+  BOTTOM: 'BOTTOM',
+  RIGHT: 'RIGHT',
+  LEFT: 'LEFT',
+};
+
+const DIRECTION_TICKS = {
+  UP: (x, y) => ({ x, y: y - 1 }),
+  BOTTOM: (x, y) => ({ x, y: y + 1 }),
+  RIGHT: (x, y) => ({ x: x + 1, y }),
+  LEFT: (x, y) => ({ x: x - 1, y }),
+};
+
+// TODO compose instead
+const setSnakePosition = (prevState) => ({
+  snake: {
+    position: {
+      ...DIRECTION_TICKS[prevState.controls.direction](prevState.snake.position.x, prevState.snake.position.y),
+    },
+  },
+});
+
 class App extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
+      controls: {
+        direction: CONTROLS.RIGHT,
+      },
       snake: {
         position: {
           x: 10,
@@ -27,12 +52,24 @@ class App extends Component {
           y: 25,
         },
       },
-    }
+    };
+
+  }
+
+  componentDidMount() {
+    this.interval = setInterval(this.tick, 150);
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.interval);
+  }
+
+  tick = () => {
+    this.setState(setSnakePosition)
   }
 
   render() {
     const { snake, snack } = this.state;
-
     return (
       <div>
         <Grid
