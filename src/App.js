@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import cs from 'classnames';
 
+import { some } from 'lodash';
+
 import './App.css';
 
 var GRID_ARRAY = [];
@@ -30,12 +32,46 @@ const DIRECTION_TICKS = {
   LEFT: (x, y) => ({ x: x - 1, y }),
 };
 
-// TODO compose instead
-const applySnakePosition = (prevState) => ({
-  snake: {
-    position: {
-      ...DIRECTION_TICKS[prevState.controls.direction](prevState.snake.position.x, prevState.snake.position.y),
+const isPosition = (x, y, diffX, diffY) =>
+  x === diffX && y === diffY;
+
+const get = (array, property) =>
+  array.map(v => v[property]);
+
+// TODO make own some, use compose
+const isSnake = (x, y, snakeCoordinates) => {
+  for (var i = 0; i < snakeCoordinates.length; i++) {
+    if (isPosition(snakeCoordinates[i].x, snakeCoordinates[i].y, x, y)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+// TODO compose instead: direction ticks
+// TODO make last a previous compose step
+const applySnakePosition = (prevState) => {
+  // TODO babel stage
+  // const [...snakeCoordinatesWithoutLast, lastCoordinate] = prevState.snake.coordinates;
+
+  // const snakeCoordinatesWithoutLast = prevState.snake.coordinates.slice()
+
+  return {
+    snake: {
+      coordinates: [
+        DIRECTION_TICKS[prevState.controls.direction](
+          prevState.snake.coordinates[0].x,
+          prevState.snake.coordinates[0].y,
+        ),
+        // ...prevState.snake.coordinates,
+      ],
     },
+  };
+};
+
+const applySnakeAte = (prevState) => ({
+  snake: {
+
   },
 });
 
@@ -44,6 +80,9 @@ const doChangeDirection = (direction) => () => ({
     direction,
   },
 });
+
+const isSnakeEating = ({ snake, snack }) =>
+ isPosition(snake.coordinates[0].x, snack.coordinate.x) && isPosition(snake.coordinates[0].y, snack.coordinate.y);
 
 class App extends Component {
   constructor(props) {
@@ -54,13 +93,13 @@ class App extends Component {
         direction: CONTROLS.RIGHT,
       },
       snake: {
-        position: {
+        coordinates: [{
           x: 10,
           y: 25,
-        },
+        }],
       },
       snack: {
-        position: {
+        coordinate: {
           x: 40,
           y: 25,
         },
@@ -82,6 +121,10 @@ class App extends Component {
   }
 
   onTick = () => {
+    // if (isSnakeEating(this.state)) {
+    //   this.setState(applySnakeAte);
+    // }
+
     this.setState(applySnakePosition);
   }
 
@@ -93,7 +136,6 @@ class App extends Component {
 
   render() {
     const { snake, snack } = this.state
-    console.log(this.state.controls.direction);;
     return (
       <div>
         <Grid
@@ -126,9 +168,6 @@ const Row = ({ snake, snack, y }) =>
     />)}
   </div>
 
-const isPosition = (x, y, diffX, diffY) =>
-  x === diffX && y === diffY;
-
 const Cell = ({
   snake,
   snack,
@@ -138,8 +177,8 @@ const Cell = ({
   const cellCs = cs(
     "grid-cell",
     {
-      "grid-cell-snake": isPosition(x, y, snake.position.x, snake.position.y),
-      "grid-cell-snack": isPosition(x, y, snack.position.x, snack.position.y),
+      "grid-cell-snake": isSnake(x, y, snake.coordinates),
+      "grid-cell-snack": isPosition(x, y, snack.coordinate.x, snack.coordinate.y),
     }
   );
 
