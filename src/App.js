@@ -5,9 +5,12 @@ import { some } from 'lodash';
 
 import './App.css';
 
+const GRID_SIZE = 40;
+const TICK_RATE = 100;
+
 var GRID_ARRAY = [];
 
-for (var i = 0; i <= 50; i++) {
+for (var i = 0; i <= GRID_SIZE; i++) {
   GRID_ARRAY.push(i);
 }
 
@@ -35,8 +38,8 @@ const DIRECTION_TICKS = {
 const isPosition = (x, y, diffX, diffY) =>
   x === diffX && y === diffY;
 
-const get = (array, property) =>
-  array.map(v => v[property]);
+const getRandomCoordinate = () =>
+  ({ x: Math.floor(Math.random() * GRID_SIZE), y: Math.floor(Math.random() * GRID_SIZE) });
 
 // TODO make own some, use compose
 const isSnake = (x, y, snakeCoordinates) => {
@@ -56,20 +59,30 @@ const applySnakePosition = (prevState) => {
 
   // const snakeCoordinatesWithoutLast = prevState.snake.coordinates.slice()
 
+  const isSnakeEating = getIsSnakeEating(prevState);
+
   const snakeHead = DIRECTION_TICKS[prevState.controls.direction](
     prevState.snake.coordinates[0].x,
     prevState.snake.coordinates[0].y,
   );
 
-  const isSnakeEating = getIsSnakeEating(prevState);
   const snakeTail = isSnakeEating
     ? prevState.snake.coordinates
-    : prevState.snake.coordinates.slice(0, prevState.snake.coordinates.length - 1)
+    : prevState.snake.coordinates.slice(0, prevState.snake.coordinates.length - 1);
+
+  const snackCoordinate = isSnakeEating
+   ? getRandomCoordinate()
+   : prevState.snack.coordinate;
+
+   console.log(snackCoordinate);
 
   return {
     snake: {
       coordinates: [snakeHead].concat(snakeTail)
     },
+    snack: {
+      coordinate: snackCoordinate
+    }
   };
 };
 
@@ -91,23 +104,17 @@ class App extends Component {
         direction: CONTROLS.RIGHT,
       },
       snake: {
-        coordinates: [{
-          x: 10,
-          y: 25,
-        }],
+        coordinates: [getRandomCoordinate()],
       },
       snack: {
-        coordinate: {
-          x: 40,
-          y: 25,
-        },
+        coordinate: getRandomCoordinate(),
       },
     };
 
   }
 
   componentDidMount() {
-    this.interval = setInterval(this.onTick, 150);
+    this.interval = setInterval(this.onTick, TICK_RATE);
 
     window.addEventListener('keyup', this.onChangeDirection, false);
   }
