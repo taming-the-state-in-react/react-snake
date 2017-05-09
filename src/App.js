@@ -56,24 +56,22 @@ const applySnakePosition = (prevState) => {
 
   // const snakeCoordinatesWithoutLast = prevState.snake.coordinates.slice()
 
+  const snakeHead = DIRECTION_TICKS[prevState.controls.direction](
+    prevState.snake.coordinates[0].x,
+    prevState.snake.coordinates[0].y,
+  );
+
+  const isSnakeEating = getIsSnakeEating(prevState);
+  const snakeTail = isSnakeEating
+    ? prevState.snake.coordinates
+    : prevState.snake.coordinates.slice(0, prevState.snake.coordinates.length - 1)
+
   return {
     snake: {
-      coordinates: [
-        DIRECTION_TICKS[prevState.controls.direction](
-          prevState.snake.coordinates[0].x,
-          prevState.snake.coordinates[0].y,
-        ),
-        // ...prevState.snake.coordinates,
-      ],
+      coordinates: [snakeHead].concat(snakeTail)
     },
   };
 };
-
-const applySnakeAte = (prevState) => ({
-  snake: {
-
-  },
-});
 
 const doChangeDirection = (direction) => () => ({
   controls: {
@@ -81,8 +79,8 @@ const doChangeDirection = (direction) => () => ({
   },
 });
 
-const isSnakeEating = ({ snake, snack }) =>
- isPosition(snake.coordinates[0].x, snack.coordinate.x) && isPosition(snake.coordinates[0].y, snack.coordinate.y);
+const getIsSnakeEating = ({ snake, snack }) =>
+ isPosition(snake.coordinates[0].x, snake.coordinates[0].y, snack.coordinate.x, snack.coordinate.y)
 
 class App extends Component {
   constructor(props) {
@@ -121,10 +119,6 @@ class App extends Component {
   }
 
   onTick = () => {
-    // if (isSnakeEating(this.state)) {
-    //   this.setState(applySnakeAte);
-    // }
-
     this.setState(applySnakePosition);
   }
 
