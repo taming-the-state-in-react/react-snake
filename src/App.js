@@ -32,14 +32,14 @@ const DIRECTION_TICKS = {
   LEFT: (x, y) => ({ x: x - 1, y }),
 };
 
-const isPosition = (x, y, diffX, diffY) =>
-  x === diffX && y === diffY;
-
 const getRandomCoordinate = () =>
   ({
     x: Math.floor(Math.random() * GRID_SIZE),
     y: Math.floor(Math.random() * GRID_SIZE),
   });
+
+const isPosition = (x, y, diffX, diffY) =>
+  x === diffX && y === diffY;
 
 // TODO make own some, use compose
 const isSnake = (x, y, snakeCoordinates) => {
@@ -81,14 +81,14 @@ const applySnakePosition = (prevState) => {
   };
 };
 
+const getIsSnakeEating = ({ snake, snack }) =>
+ isPosition(snake.coordinates[0].x, snake.coordinates[0].y, snack.coordinate.x, snack.coordinate.y);
+
 const doChangeDirection = (direction) => () => ({
   controls: {
     direction,
   },
 });
-
-const getIsSnakeEating = ({ snake, snack }) =>
- isPosition(snake.coordinates[0].x, snake.coordinates[0].y, snack.coordinate.x, snack.coordinate.y);
 
 class App extends Component {
   constructor(props) {
