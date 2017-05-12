@@ -32,6 +32,12 @@ const DIRECTION_TICKS = {
   LEFT: (x, y) => ({ x: x - 1, y }),
 };
 
+const getIsGameOver = (state) =>
+  state.playground.isGameOver;
+
+const getIsAllowedToChangeDirection = (state, e) =>
+  !getIsGameOver(state) && KEY_CODES_MAPPER[e.keyCode];
+
 const getRandomCoordinate = () =>
   ({
     x: Math.floor(Math.random() * GRID_SIZE),
@@ -51,14 +57,31 @@ const isSnake = (x, y, snakeCoordinates) => {
   return false;
 };
 
+const getSnakeHead = (snake) =>
+  snake.coordinates[0];
+
+// apply FP
+const getIsSnakeOutside = (snake) =>
+  getSnakeHead(snake).x >= GRID_SIZE ||
+  getSnakeHead(snake).y >= GRID_SIZE ||
+  getSnakeHead(snake).x < 0 ||
+  getSnakeHead(snake).y < 0;
+
+const getIsSnakeClumy = (snake) =>
+  false;
+
+// apply FP
+const getIsSnakeEating = ({ snake, snack }) =>
+ isPosition(getSnakeHead(snake).x, getSnakeHead(snake).y, snack.coordinate.x, snack.coordinate.y);
+
 // TODO compose instead: direction ticks
 // TODO make last a previous compose step
 const applySnakePosition = (prevState) => {
   const isSnakeEating = getIsSnakeEating(prevState);
 
-  const snakeHead = DIRECTION_TICKS[prevState.controls.direction](
-    prevState.snake.coordinates[0].x,
-    prevState.snake.coordinates[0].y,
+  const snakeHead = DIRECTION_TICKS[prevState.playground.direction](
+    getSnakeHead(prevState.snake).x,
+    getSnakeHead(prevState.snake).y,
   );
 
   // TODO babel stage
@@ -81,22 +104,29 @@ const applySnakePosition = (prevState) => {
   };
 };
 
-const getIsSnakeEating = ({ snake, snack }) =>
- isPosition(snake.coordinates[0].x, snake.coordinates[0].y, snack.coordinate.x, snack.coordinate.y);
-
 const doChangeDirection = (direction) => () => ({
-  controls: {
+  playground: {
     direction,
   },
 });
+
+const getCellCs = (snake, snack, x, y) =>
+  cs(
+    'grid-cell',
+    {
+      'grid-cell-snake': isSnake(x, y, snake.coordinates),
+      'grid-cell-snack': isPosition(x, y, snack.coordinate.x, snack.coordinate.y),
+    }
+  );
 
 class App extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      controls: {
+      playground: {
         direction: CONTROLS.RIGHT,
+        isGameOver: false,
       },
       snake: {
         coordinates: [getRandomCoordinate()],
@@ -120,11 +150,15 @@ class App extends Component {
   }
 
   onTick = () => {
+    if (getIsSnakeOutside(this.state.snake) || getIsSnakeClumy(this.state.snake)) {
+      return;
+    }
+
     this.setState(applySnakePosition);
   }
 
   onChangeDirection = (e) => {
-    if (KEY_CODES_MAPPER[e.keyCode]) {
+    if (getIsAllowedToChangeDirection(this.state, e)) {
       this.setState(doChangeDirection(KEY_CODES_MAPPER[e.keyCode]));
     }
   }
@@ -164,6 +198,6 @@ const Row = ({ snake, snack, y }) =>
   </div>
 
 const Cell = ({ snake, snack, x, y }) =>
-  <div className={getCellCs(sname, snack, x, y)} />;
+  <div className={getCellCs(snake, snack, x, y)} />;
 
 export default App;
