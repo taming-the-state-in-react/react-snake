@@ -17,6 +17,10 @@
   height: 15px;
 }
 
+.grid-cell-border {
+  background-color: #000000;
+}
+
 .grid-cell-snake {
   background-color: #000000;
 }

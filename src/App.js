@@ -7,7 +7,7 @@ const GRID_SIZE = 40;
 const TICK_RATE = 100;
 const GRID_ARRAY = [];
 
-for (var i = 0; i <= GRID_SIZE; i++) {
+for (let i = 0; i <= GRID_SIZE; i++) {
   GRID_ARRAY.push(i);
 }
 
@@ -60,7 +60,12 @@ const isSnake = (x, y, snakeCoordinates) => {
 const getSnakeHead = (snake) =>
   snake.coordinates[0];
 
-// apply FP
+const getSnakeWithoutStub = (snake) =>
+  snake.coordinates.slice(0, snake.coordinates.length - 1);
+
+const getSnakeTail = (snake) =>
+  snake.coordinates.slice(1);
+
 const getIsSnakeOutside = (snake) =>
   getSnakeHead(snake).x >= GRID_SIZE ||
   getSnakeHead(snake).y >= GRID_SIZE ||
@@ -68,7 +73,7 @@ const getIsSnakeOutside = (snake) =>
   getSnakeHead(snake).y < 0;
 
 const getIsSnakeClumy = (snake) =>
-  false;
+  isSnake(getSnakeHead(snake).x, getSnakeHead(snake).y, getSnakeTail(snake));
 
 // apply FP
 const getIsSnakeEating = ({ snake, snack }) =>
@@ -84,11 +89,9 @@ const applySnakePosition = (prevState) => {
     getSnakeHead(prevState.snake).y,
   );
 
-  // TODO babel stage
-  // const [...snakeCoordinatesWithoutLast, lastCoordinate] = prevState.snake.coordinates;
   const snakeTail = isSnakeEating
     ? prevState.snake.coordinates
-    : prevState.snake.coordinates.slice(0, prevState.snake.coordinates.length - 1);
+    : getSnakeWithoutStub(prevState.snake);
 
   const snackCoordinate = isSnakeEating
    ? getRandomCoordinate()
@@ -153,7 +156,6 @@ class App extends Component {
     if (getIsSnakeOutside(this.state.snake) || getIsSnakeClumy(this.state.snake)) {
       return;
     }
-
     this.setState(applySnakePosition);
   }
 
@@ -178,16 +180,19 @@ class App extends Component {
 
 const Grid = ({ snake, snack }) =>
   <div className="grid">
-    {GRID_ARRAY.map(y => <Row
-      y={y}
-      key={y}
-      snake={snake}
-      snack={snack}
-    />)}
+    <Border grid={GRID_ARRAY} />
+      {GRID_ARRAY.map(y => <Row
+        y={y}
+        key={y}
+        snake={snake}
+        snack={snack}
+      />)}
+    <Border grid={GRID_ARRAY} />
   </div>
 
 const Row = ({ snake, snack, y }) =>
   <div className="grid-row">
+    <Block />
     {GRID_ARRAY.map(x => <Cell
       x={x}
       y={y}
@@ -195,7 +200,18 @@ const Row = ({ snake, snack, y }) =>
       snake={snake}
       snack={snack}
     />)}
+    <Block />
   </div>
+
+const Border = ({ grid }) =>
+  <div className="grid-row">
+    <Block />
+    {grid.map(v => <Block key={v} />)}
+    <Block />
+  </div>
+
+const Block = () =>
+  <div className="grid-cell grid-cell-border" />
 
 const Cell = ({ snake, snack, x, y }) =>
   <div className={getCellCs(snake, snack, x, y)} />;
