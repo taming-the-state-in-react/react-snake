@@ -3,12 +3,12 @@ import cs from 'classnames';
 
 import './App.css';
 
-const GRID_SIZE = 40;
+const GRID_SIZE = 20;
 const TICK_RATE = 100;
-const GRID_ARRAY = [];
+const GRID = [];
 
 for (let i = 0; i <= GRID_SIZE; i++) {
-  GRID_ARRAY.push(i);
+  GRID.push(i);
 }
 
 const KEY_CODES_MAPPER = {
@@ -38,24 +38,20 @@ const getIsGameOver = (state) =>
 const getIsAllowedToChangeDirection = (state, e) =>
   !getIsGameOver(state) && KEY_CODES_MAPPER[e.keyCode];
 
+const getRandomNumberFromRange = (min, max) =>
+  Math.floor(Math.random() * (max - min +1 ) + min);
+
 const getRandomCoordinate = () =>
   ({
-    x: Math.floor(Math.random() * GRID_SIZE),
-    y: Math.floor(Math.random() * GRID_SIZE),
+    x: getRandomNumberFromRange(1, GRID_SIZE - 1),
+    y: getRandomNumberFromRange(1, GRID_SIZE - 1),
   });
 
 const isPosition = (x, y, diffX, diffY) =>
   x === diffX && y === diffY;
 
-// TODO make own some, use compose
-const isSnake = (x, y, snakeCoordinates) => {
-  for (var i = 0; i < snakeCoordinates.length; i++) {
-    if (isPosition(snakeCoordinates[i].x, snakeCoordinates[i].y, x, y)) {
-      return true;
-    }
-  }
-  return false;
-};
+const isSnake = (x, y, snakeCoordinates) =>
+  snakeCoordinates.filter(coordinate => isPosition(coordinate.x, coordinate.y, x, y)).length;
 
 const getSnakeHead = (snake) =>
   snake.coordinates[0];
@@ -69,8 +65,8 @@ const getSnakeTail = (snake) =>
 const getIsSnakeOutside = (snake) =>
   getSnakeHead(snake).x >= GRID_SIZE ||
   getSnakeHead(snake).y >= GRID_SIZE ||
-  getSnakeHead(snake).x < 0 ||
-  getSnakeHead(snake).y < 0;
+  getSnakeHead(snake).x <= 0 ||
+  getSnakeHead(snake).y <= 0;
 
 const getIsSnakeClumy = (snake) =>
   isSnake(getSnakeHead(snake).x, getSnakeHead(snake).y, getSnakeTail(snake));
@@ -105,7 +101,7 @@ const applySnakePosition = (prevState) => {
 
   return {
     snake: {
-      coordinates: [snakeHead].concat(snakeTail), // babel
+      coordinates: [snakeHead, ...snakeTail],
     },
     snack: {
       coordinate: snackCoordinate,
@@ -125,7 +121,8 @@ const getCellCs = (isGameOver, snake, snack, x, y) =>
     {
       'grid-cell-snake': isSnake(x, y, snake.coordinates),
       'grid-cell-snack': isPosition(x, y, snack.coordinate.x, snack.coordinate.y),
-      'grid-cell-hit': isGameOver && isPosition(x, y, getSnakeHead(snake).x, getSnakeHead(snake).y)
+      'grid-cell-border': x === 0 || y === 0 || x === GRID_SIZE || y === GRID_SIZE,
+      'grid-cell-hit': isGameOver && isPosition(x, y, getSnakeHead(snake).x, getSnakeHead(snake).y),
     }
   );
 
@@ -196,21 +193,18 @@ class App extends Component {
 
 const Grid = ({ isGameOver, snake, snack }) =>
   <div className="grid">
-    <Border grid={GRID_ARRAY} />
-      {GRID_ARRAY.map(y => <Row
-        y={y}
-        key={y}
-        snake={snake}
-        snack={snack}
-        isGameOver={isGameOver}
-      />)}
-    <Border grid={GRID_ARRAY} />
+    {GRID.map(y => <Row
+      y={y}
+      key={y}
+      snake={snake}
+      snack={snack}
+      isGameOver={isGameOver}
+    />)}
   </div>
 
 const Row = ({ isGameOver, snake, snack, y }) =>
   <div className="grid-row">
-    <Block />
-    {GRID_ARRAY.map(x => <Cell
+    {GRID.map(x => <Cell
       x={x}
       y={y}
       key={x}
@@ -218,18 +212,7 @@ const Row = ({ isGameOver, snake, snack, y }) =>
       snack={snack}
       isGameOver={isGameOver}
     />)}
-    <Block />
   </div>
-
-const Border = ({ grid }) =>
-  <div className="grid-row">
-    <Block />
-    {grid.map(v => <Block key={v} />)}
-    <Block />
-  </div>
-
-const Block = () =>
-  <div className="grid-cell grid-cell-border" />
 
 const Cell = ({ isGameOver, snake, snack, x, y }) =>
   <div className={getCellCs(isGameOver, snake, snack, x, y)} />;
