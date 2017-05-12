@@ -29,6 +29,10 @@
   background-color: #008000;
 }
 
+.grid-cell-hit {
+  background-color: red;
+}
+
 .grid-cell:last-child {
   border-right: 1px solid #000000;
 }

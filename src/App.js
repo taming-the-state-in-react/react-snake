@@ -79,6 +79,12 @@ const getIsSnakeClumy = (snake) =>
 const getIsSnakeEating = ({ snake, snack }) =>
  isPosition(getSnakeHead(snake).x, getSnakeHead(snake).y, snack.coordinate.x, snack.coordinate.y);
 
+const applyGameOver = (prevState) => ({
+  playground: {
+    isGameOver: true
+  },
+})
+
 // TODO compose instead: direction ticks
 // TODO make last a previous compose step
 const applySnakePosition = (prevState) => {
@@ -113,12 +119,13 @@ const doChangeDirection = (direction) => () => ({
   },
 });
 
-const getCellCs = (snake, snack, x, y) =>
+const getCellCs = (isGameOver, snake, snack, x, y) =>
   cs(
     'grid-cell',
     {
       'grid-cell-snake': isSnake(x, y, snake.coordinates),
       'grid-cell-snack': isPosition(x, y, snack.coordinate.x, snack.coordinate.y),
+      'grid-cell-hit': isGameOver && isPosition(x, y, getSnakeHead(snake).x, getSnakeHead(snake).y)
     }
   );
 
@@ -153,10 +160,9 @@ class App extends Component {
   }
 
   onTick = () => {
-    if (getIsSnakeOutside(this.state.snake) || getIsSnakeClumy(this.state.snake)) {
-      return;
-    }
-    this.setState(applySnakePosition);
+    getIsSnakeOutside(this.state.snake) || getIsSnakeClumy(this.state.snake)
+      ? this.setState(applyGameOver)
+      : this.setState(applySnakePosition);
   }
 
   onChangeDirection = (e) => {
@@ -166,19 +172,29 @@ class App extends Component {
   }
 
   render() {
-    const { snake, snack } = this.state;
+    const {
+      playground,
+      snake,
+      snack,
+    } = this.state;
+
+    const {
+      isGameOver,
+    } = playground;
+
     return (
       <div>
         <Grid
           snake={snake}
           snack={snack}
+          isGameOver={isGameOver}
         />
       </div>
     );
   }
 }
 
-const Grid = ({ snake, snack }) =>
+const Grid = ({ isGameOver, snake, snack }) =>
   <div className="grid">
     <Border grid={GRID_ARRAY} />
       {GRID_ARRAY.map(y => <Row
@@ -186,11 +202,12 @@ const Grid = ({ snake, snack }) =>
         key={y}
         snake={snake}
         snack={snack}
+        isGameOver={isGameOver}
       />)}
     <Border grid={GRID_ARRAY} />
   </div>
 
-const Row = ({ snake, snack, y }) =>
+const Row = ({ isGameOver, snake, snack, y }) =>
   <div className="grid-row">
     <Block />
     {GRID_ARRAY.map(x => <Cell
@@ -199,6 +216,7 @@ const Row = ({ snake, snack, y }) =>
       key={x}
       snake={snake}
       snack={snack}
+      isGameOver={isGameOver}
     />)}
     <Block />
   </div>
@@ -213,7 +231,7 @@ const Border = ({ grid }) =>
 const Block = () =>
   <div className="grid-cell grid-cell-border" />
 
-const Cell = ({ snake, snack, x, y }) =>
-  <div className={getCellCs(snake, snack, x, y)} />;
+const Cell = ({ isGameOver, snake, snack, x, y }) =>
+  <div className={getCellCs(isGameOver, snake, snack, x, y)} />;
 
 export default App;
