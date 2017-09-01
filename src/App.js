@@ -3,7 +3,7 @@ import cs from 'classnames';
 
 import './App.css';
 
-const GRID_SIZE = 20;
+const GRID_SIZE = 35;
 const TICK_RATE = 100;
 const GRID = [];
 
@@ -71,7 +71,6 @@ const getIsSnakeOutside = (snake) =>
 const getIsSnakeClumy = (snake) =>
   isSnake(getSnakeHead(snake).x, getSnakeHead(snake).y, getSnakeTail(snake));
 
-// apply FP
 const getIsSnakeEating = ({ snake, snack }) =>
  isPosition(getSnakeHead(snake).x, getSnakeHead(snake).y, snack.coordinate.x, snack.coordinate.y);
 
@@ -180,7 +179,8 @@ class App extends Component {
     } = playground;
 
     return (
-      <div>
+      <div className="app">
+        <h1>Snake!</h1>
         <Grid
           snake={snake}
           snack={snack}
@@ -215,6 +215,6 @@ const Row = ({ isGameOver, snake, snack, y }) =>
   </div>
 
 const Cell = ({ isGameOver, snake, snack, x, y }) =>
-  <div className={getCellCs(isGameOver, snake, snack, x, y)} />;
+  <div className={getCellCs(isGameOver, snake, snack, x, y)} />
 
 export default App;
