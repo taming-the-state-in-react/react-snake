@@ -4,10 +4,6 @@
   align-items: center;
 }
 
-.grid {
-
-}
-
 .grid-row {
   display: flex;
   flex-direction: row;
@@ -23,6 +19,10 @@
   height: 15px;
 }
 
+.grid-cell:last-child {
+  border-right: 1px solid #000000;
+}
+
 .grid-cell-border {
   background-color: #000000;
 }
@@ -32,13 +32,9 @@
 }
 
 .grid-cell-snack {
-  background-color: #008000;
+  background-color: blue;
 }
 
 .grid-cell-hit {
   background-color: red;
-}
-
-.grid-cell:last-child {
-  border-right: 1px solid #000000;
 }

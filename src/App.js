@@ -192,26 +192,30 @@ class App extends Component {
 }
 
 const Grid = ({ isGameOver, snake, snack }) =>
-  <div className="grid">
-    {GRID.map(y => <Row
-      y={y}
-      key={y}
-      snake={snake}
-      snack={snack}
-      isGameOver={isGameOver}
-    />)}
+  <div>
+    {GRID.map(y =>
+      <Row
+        y={y}
+        key={y}
+        snake={snake}
+        snack={snack}
+        isGameOver={isGameOver}
+      />
+    )}
   </div>
 
 const Row = ({ isGameOver, snake, snack, y }) =>
   <div className="grid-row">
-    {GRID.map(x => <Cell
-      x={x}
-      y={y}
-      key={x}
-      snake={snake}
-      snack={snack}
-      isGameOver={isGameOver}
-    />)}
+    {GRID.map(x =>
+      <Cell
+        x={x}
+        y={y}
+        key={x}
+        snake={snake}
+        snack={snack}
+        isGameOver={isGameOver}
+      />
+    )}
   </div>
 
 const Cell = ({ isGameOver, snake, snack, x, y }) =>
