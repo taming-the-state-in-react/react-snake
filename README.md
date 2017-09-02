@@ -6,12 +6,12 @@
 * `npm start`
 * visit http://localhost:3000/
 
-# Instructions
+# Instructions (Bonus Draft taken from Screencasts)
 
-create-react-app react-snake
-cd react-snake
-sublime .
-npm start
+* create-react-app react-snake
+* cd react-snake
+* sublime .
+* npm start
 
 # Part 1: The Playground
 
