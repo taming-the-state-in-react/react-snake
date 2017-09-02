@@ -3,8 +3,8 @@ import cs from 'classnames';
 
 import './App.css';
 
-const GRID_SIZE = 35;
 const TICK_RATE = 100;
+const GRID_SIZE = 35;
 const GRID = [];
 
 for (let i = 0; i <= GRID_SIZE; i++) {
@@ -18,7 +18,7 @@ const KEY_CODES_MAPPER = {
   40: 'BOTTOM',
 };
 
-const CONTROLS = {
+const DIRECTIONS = {
   UP: 'UP',
   RIGHT: 'RIGHT',
   LEFT: 'LEFT',
@@ -32,12 +32,6 @@ const DIRECTION_TICKS = {
   LEFT: (x, y) => ({ x: x - 1, y }),
 };
 
-const getIsGameOver = (state) =>
-  state.playground.isGameOver;
-
-const getIsAllowedToChangeDirection = (state, e) =>
-  !getIsGameOver(state) && KEY_CODES_MAPPER[e.keyCode];
-
 const getRandomNumberFromRange = (min, max) =>
   Math.floor(Math.random() * (max - min +1 ) + min);
 
@@ -46,6 +40,9 @@ const getRandomCoordinate = () =>
     x: getRandomNumberFromRange(1, GRID_SIZE - 1),
     y: getRandomNumberFromRange(1, GRID_SIZE - 1),
   });
+
+const isBorder = (x, y) =>
+  x === 0 || y === 0 || x === GRID_SIZE || y === GRID_SIZE;
 
 const isPosition = (x, y, diffX, diffY) =>
   x === diffX && y === diffY;
@@ -78,10 +75,8 @@ const applyGameOver = (prevState) => ({
   playground: {
     isGameOver: true
   },
-})
+});
 
-// TODO compose instead: direction ticks
-// TODO make last a previous compose step
 const applySnakePosition = (prevState) => {
   const isSnakeEating = getIsSnakeEating(prevState);
 
@@ -120,7 +115,7 @@ const getCellCs = (isGameOver, snake, snack, x, y) =>
     {
       'grid-cell-snake': isSnake(x, y, snake.coordinates),
       'grid-cell-snack': isPosition(x, y, snack.coordinate.x, snack.coordinate.y),
-      'grid-cell-border': x === 0 || y === 0 || x === GRID_SIZE || y === GRID_SIZE,
+      'grid-cell-border': isBorder(x, y),
       'grid-cell-hit': isGameOver && isPosition(x, y, getSnakeHead(snake).x, getSnakeHead(snake).y),
     }
   );
@@ -131,7 +126,7 @@ class App extends Component {
 
     this.state = {
       playground: {
-        direction: CONTROLS.RIGHT,
+        direction: DIRECTIONS.RIGHT,
         isGameOver: false,
       },
       snake: {
@@ -161,9 +156,9 @@ class App extends Component {
       : this.setState(applySnakePosition);
   }
 
-  onChangeDirection = (e) => {
-    if (getIsAllowedToChangeDirection(this.state, e)) {
-      this.setState(doChangeDirection(KEY_CODES_MAPPER[e.keyCode]));
+  onChangeDirection = (event) => {
+    if (KEY_CODES_MAPPER[event.keyCode]) {
+      this.setState(doChangeDirection(KEY_CODES_MAPPER[event.keyCode]));
     }
   }
 
@@ -174,17 +169,13 @@ class App extends Component {
       snack,
     } = this.state;
 
-    const {
-      isGameOver,
-    } = playground;
-
     return (
       <div className="app">
         <h1>Snake!</h1>
         <Grid
           snake={snake}
           snack={snack}
-          isGameOver={isGameOver}
+          isGameOver={playground.isGameOver}
         />
       </div>
     );
