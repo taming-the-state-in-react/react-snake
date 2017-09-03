@@ -1,7 +1,5 @@
 # React Snake (Functional Style)
 
-* [Source Code from Course](https://roadtoreact.com/)
-
 ![sep-02-2017 17-09-49](https://user-images.githubusercontent.com/2479967/29996581-94a6c5a2-9001-11e7-85d6-3e60828a9deb.gif)
 
 ## Installation
@@ -20,7 +18,7 @@
 * [Part 04](https://github.com/rwieruch/react-snake/tree/4.0.0)
 * [Part 05](https://github.com/rwieruch/react-snake/tree/5.0.0)
 
-## Draft Instructions (Bonus taken from Screencasts)
+## Bonus: Draft Instructions (Taken from Screencasts)
 
 * create-react-app react-snake
 * cd react-snake
