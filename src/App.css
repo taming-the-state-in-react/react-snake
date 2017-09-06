@@ -10,18 +10,11 @@
 }
 
 .grid-cell {
-  display: flex;
-  flex-direction: column;
-
   border-top: 1px solid #000000;
   border-left: 1px solid #000000;
 
   width: 15px;
   height: 15px;
-}
-
-.grid-cell:last-child {
-  border-right: 1px solid #000000;
 }
 
 .grid-cell-border {
