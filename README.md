@@ -1,6 +1,14 @@
 # React Snake (Functional Style)
 
+* Found in [Taming the State in React](https://roadtoreact.com/course-details?courseId=TAMING_THE_STATE)
+* [Live](https://react-snake.wieruch.com/)
+
 ![sep-02-2017 17-09-49](https://user-images.githubusercontent.com/2479967/29996581-94a6c5a2-9001-11e7-85d6-3e60828a9deb.gif)
+
+## Features
+
+* uses:
+  * only React (create-react-app)
 
 ## Installation
 
