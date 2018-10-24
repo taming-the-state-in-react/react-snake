@@ -1,6 +1,6 @@
 # React Snake (Functional Style)
 
-[![Slack](https://slack-the-road-to-learn-react.wieruch.com/badge.svg)](https://slack-the-road-to-learn-react.wieruch.com/)
+[![Build Status](https://travis-ci.org/taming-the-state-in-react/react-snake.svg?branch=master)](https://travis-ci.org/taming-the-state-in-react/react-snake) [![Slack](https://slack-the-road-to-learn-react.wieruch.com/badge.svg)](https://slack-the-road-to-learn-react.wieruch.com/)
 
 * Found in [Taming the State in React](https://roadtoreact.com/course-details?courseId=TAMING_THE_STATE)
 * [Live](https://evening-everglades-29185.herokuapp.com/)
@@ -14,7 +14,7 @@
 
 ## Installation
 
-* `git clone git@github.com:rwieruch/react-snake.git`
+* `git clone git@github.com:taming-the-state-in-react/react-snake.git`
 * `cd react-snake`
 * `npm install`
 * `npm start`
