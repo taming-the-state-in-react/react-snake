@@ -1,6 +1,6 @@
 # React Snake (Functional Style)
 
-[![Build Status](https://travis-ci.org/taming-the-state-in-react/react-snake.svg?branch=master)](https://travis-ci.org/taming-the-state-in-react/react-snake) [![Slack](https://slack-the-road-to-learn-react.wieruch.com/badge.svg)](https://slack-the-road-to-learn-react.wieruch.com/)
+[![Build Status](https://travis-ci.org/taming-the-state-in-react/react-snake.svg?branch=master)](https://travis-ci.org/taming-the-state-in-react/react-snake) [![Slack](https://slack-the-road-to-learn-react.wieruch.com/badge.svg)](https://slack-the-road-to-learn-react.wieruch.com/) [![Greenkeeper badge](https://badges.greenkeeper.io/taming-the-state-in-react/react-snake.svg)](https://greenkeeper.io/)
 
 * Found in [Taming the State in React](https://roadtoreact.com/course-details?courseId=TAMING_THE_STATE)
 * [Live](https://evening-everglades-29185.herokuapp.com/)
