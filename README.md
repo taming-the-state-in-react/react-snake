@@ -27,3 +27,5 @@
 * [Part 03](https://github.com/rwieruch/react-snake/tree/3.0.0)
 * [Part 04](https://github.com/rwieruch/react-snake/tree/4.0.0)
 * [Part 05](https://github.com/rwieruch/react-snake/tree/5.0.0)
+
+* [Migration from Class to Function Component with Hooks](https://github.com/taming-the-state-in-react/react-snake/commit/8ea5bb69131967cb127e4fd1cdb172dbfb14fc07)
