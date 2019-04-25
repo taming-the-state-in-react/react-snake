@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React from 'react';
 import cs from 'classnames';
 
 import './App.css';
@@ -33,158 +33,173 @@ const KEY_CODES_MAPPER = {
 };
 
 const getRandomNumberFromRange = (min, max) =>
-  Math.floor(Math.random() * (max - min +1 ) + min);
+  Math.floor(Math.random() * (max - min + 1) + min);
 
-const getRandomCoordinate = () =>
-  ({
-    x: getRandomNumberFromRange(1, GRID_SIZE - 1),
-    y: getRandomNumberFromRange(1, GRID_SIZE - 1),
-  });
+const getRandomCoordinate = () => ({
+  x: getRandomNumberFromRange(1, GRID_SIZE - 1),
+  y: getRandomNumberFromRange(1, GRID_SIZE - 1),
+});
 
 const isBorder = (x, y) =>
   x === 0 || y === 0 || x === GRID_SIZE || y === GRID_SIZE;
 
-const isPosition = (x, y, diffX, diffY) =>
-  x === diffX && y === diffY;
+const isPosition = (x, y, diffX, diffY) => x === diffX && y === diffY;
 
 const isSnake = (x, y, snakeCoordinates) =>
-  snakeCoordinates.filter(coordinate => isPosition(coordinate.x, coordinate.y, x, y)).length;
+  snakeCoordinates.filter(coordinate =>
+    isPosition(coordinate.x, coordinate.y, x, y)
+  ).length;
 
-const getSnakeHead = (snake) =>
-  snake.coordinates[0];
+const getSnakeHead = snake => snake.coordinates[0];
 
-const getSnakeWithoutStub = (snake) =>
+const getSnakeWithoutStub = snake =>
   snake.coordinates.slice(0, snake.coordinates.length - 1);
 
-const getSnakeTail = (snake) =>
-  snake.coordinates.slice(1);
+const getSnakeTail = snake => snake.coordinates.slice(1);
 
-const getIsSnakeOutside = (snake) =>
+const getIsSnakeOutside = snake =>
   getSnakeHead(snake).x >= GRID_SIZE ||
   getSnakeHead(snake).y >= GRID_SIZE ||
   getSnakeHead(snake).x <= 0 ||
   getSnakeHead(snake).y <= 0;
 
-const getIsSnakeClumy = (snake) =>
-  isSnake(getSnakeHead(snake).x, getSnakeHead(snake).y, getSnakeTail(snake));
+const getIsSnakeClumy = snake =>
+  isSnake(
+    getSnakeHead(snake).x,
+    getSnakeHead(snake).y,
+    getSnakeTail(snake)
+  );
 
 const getIsSnakeEating = ({ snake, snack }) =>
- isPosition(getSnakeHead(snake).x, getSnakeHead(snake).y, snack.coordinate.x, snack.coordinate.y);
+  isPosition(
+    getSnakeHead(snake).x,
+    getSnakeHead(snake).y,
+    snack.coordinate.x,
+    snack.coordinate.y
+  );
 
 const getCellCs = (isGameOver, snake, snack, x, y) =>
-  cs(
-    'grid-cell',
-    {
-      'grid-cell-border': isBorder(x, y),
-      'grid-cell-snake': isSnake(x, y, snake.coordinates),
-      'grid-cell-snack': isPosition(x, y, snack.coordinate.x, snack.coordinate.y),
-      'grid-cell-hit': isGameOver && isPosition(x, y, getSnakeHead(snake).x, getSnakeHead(snake).y),
-    }
-  );
+  cs('grid-cell', {
+    'grid-cell-border': isBorder(x, y),
+    'grid-cell-snake': isSnake(x, y, snake.coordinates),
+    'grid-cell-snack': isPosition(
+      x,
+      y,
+      snack.coordinate.x,
+      snack.coordinate.y
+    ),
+    'grid-cell-hit':
+      isGameOver &&
+      isPosition(x, y, getSnakeHead(snake).x, getSnakeHead(snake).y),
+  });
 
-const applySnakePosition = (prevState) => {
-  const isSnakeEating = getIsSnakeEating(prevState);
+const reducer = (state, action) => {
+  switch (action.type) {
+    case 'SNAKE_CHANGE_DIRECTION':
+      return {
+        ...state,
+        playground: {
+          ...state.playground,
+          direction: action.direction,
+        },
+      };
+    case 'SNAKE_MOVE':
+      const isSnakeEating = getIsSnakeEating(state);
 
-  const snakeHead = DIRECTION_TICKS[prevState.playground.direction](
-    getSnakeHead(prevState.snake).x,
-    getSnakeHead(prevState.snake).y,
-  );
+      const snakeHead = DIRECTION_TICKS[state.playground.direction](
+        getSnakeHead(state.snake).x,
+        getSnakeHead(state.snake).y
+      );
 
-  const snakeTail = isSnakeEating
-    ? prevState.snake.coordinates
-    : getSnakeWithoutStub(prevState.snake);
+      const snakeTail = isSnakeEating
+        ? state.snake.coordinates
+        : getSnakeWithoutStub(state.snake);
 
-  const snackCoordinate = isSnakeEating
-    ? getRandomCoordinate()
-    : prevState.snack.coordinate;
+      const snackCoordinate = isSnakeEating
+        ? getRandomCoordinate()
+        : state.snack.coordinate;
 
-  return {
-    snake: {
-      coordinates: [snakeHead, ...snakeTail],
-    },
-    snack: {
-      coordinate: snackCoordinate,
-    },
-  };
+      return {
+        ...state,
+        snake: {
+          coordinates: [snakeHead, ...snakeTail],
+        },
+        snack: {
+          coordinate: snackCoordinate,
+        },
+      };
+    case 'GAME_OVER':
+      return {
+        ...state,
+        playground: {
+          ...state.playground,
+          isGameOver: true,
+        },
+      };
+    default:
+      throw new Error();
+  }
 };
 
-const applyGameOver = (prevState) => ({
+const initialState = {
   playground: {
-    isGameOver: true
+    direction: DIRECTIONS.RIGHT,
+    isGameOver: false,
   },
-});
-
-const doChangeDirection = (direction) => () => ({
-  playground: {
-    direction,
+  snake: {
+    coordinates: [getRandomCoordinate()],
   },
-});
+  snack: {
+    coordinate: getRandomCoordinate(),
+  },
+};
 
-class App extends Component {
-  constructor(props) {
-    super(props);
+const App = () => {
+  const [state, dispatch] = React.useReducer(reducer, initialState);
 
-    this.state = {
-      playground: {
-        direction: DIRECTIONS.RIGHT,
-        isGameOver: false,
-      },
-      snake: {
-        coordinates: [getRandomCoordinate()],
-      },
-      snack: {
-        coordinate: getRandomCoordinate(),
-      }
-    };
-  }
-
-  componentDidMount() {
-    this.interval = setInterval(this.onTick, TICK_RATE);
-
-    window.addEventListener('keyup', this.onChangeDirection, false);
-  }
-
-  componentWillUnmount() {
-    clearInterval(this.interval);
-
-    window.removeEventListener('keyup', this.onChangeDirection, false);
-  }
-
-  onChangeDirection = (event) => {
+  const onChangeDirection = event => {
     if (KEY_CODES_MAPPER[event.keyCode]) {
-      this.setState(doChangeDirection(KEY_CODES_MAPPER[event.keyCode]));
+      dispatch({
+        type: 'SNAKE_CHANGE_DIRECTION',
+        direction: KEY_CODES_MAPPER[event.keyCode],
+      });
     }
-  }
+  };
 
-  onTick = () => {
-    getIsSnakeOutside(this.state.snake) || getIsSnakeClumy(this.state.snake)
-      ? this.setState(applyGameOver)
-      : this.setState(applySnakePosition);
-  }
+  React.useEffect(() => {
+    window.addEventListener('keyup', onChangeDirection, false);
 
-  render() {
-    const {
-      snake,
-      snack,
-      playground,
-    } = this.state;
+    return () =>
+      window.removeEventListener('keyup', onChangeDirection, false);
+  }, []);
 
-    return (
-      <div className="app">
-        <h1>Snake!</h1>
-        <Grid
-          snake={snake}
-          snack={snack}
-          isGameOver={playground.isGameOver}
-        />
-      </div>
-    );
-  }
-}
+  React.useEffect(() => {
+    const onTick = () => {
+      getIsSnakeOutside(state.snake) || getIsSnakeClumy(state.snake)
+        ? dispatch({ type: 'GAME_OVER' })
+        : dispatch({ type: 'SNAKE_MOVE' });
+    };
 
-const Grid = ({ isGameOver, snake, snack }) =>
+    const interval = setInterval(onTick, TICK_RATE);
+
+    return () => clearInterval(interval);
+  }, [state]);
+
+  return (
+    <div className="app">
+      <h1>Snake!</h1>
+      <Grid
+        snake={state.snake}
+        snack={state.snack}
+        isGameOver={state.playground.isGameOver}
+      />
+    </div>
+  );
+};
+
+const Grid = ({ isGameOver, snake, snack }) => (
   <div>
-    {GRID.map(y =>
+    {GRID.map(y => (
       <Row
         y={y}
         key={y}
@@ -192,12 +207,13 @@ const Grid = ({ isGameOver, snake, snack }) =>
         snack={snack}
         isGameOver={isGameOver}
       />
-    )}
+    ))}
   </div>
+);
 
-const Row = ({ isGameOver, snake, snack, y }) =>
+const Row = ({ isGameOver, snake, snack, y }) => (
   <div className="grid-row">
-    {GRID.map(x =>
+    {GRID.map(x => (
       <Cell
         x={x}
         y={y}
@@ -206,10 +222,12 @@ const Row = ({ isGameOver, snake, snack, y }) =>
         snack={snack}
         isGameOver={isGameOver}
       />
-    )}
+    ))}
   </div>
+);
 
-const Cell = ({ isGameOver, snake, snack, x, y }) =>
+const Cell = ({ isGameOver, snake, snack, x, y }) => (
   <div className={getCellCs(isGameOver, snake, snack, x, y)} />
+);
 
 export default App;
